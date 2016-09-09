@@ -1,0 +1,21 @@
+{
+    "name": "wok/router",
+    "description": "WOK Router component",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sébastien ALEXANDRE",
+            "email": "sebastien@graphidev.fr"
+        }
+    ],
+    "autoload" : {
+        "psr-4": {
+            "WOK\\Router\\" : "./src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "wok/uri": "^1.0.0"
+    },
+}
