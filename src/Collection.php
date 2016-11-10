@@ -3,7 +3,6 @@
     namespace WOK\Router;
 
     use WOK\Router\Route;
-    use WOK\HttpMessage\Request;
 
     /**
      * Routes collection manager
@@ -75,19 +74,19 @@
 
         /**
          * Get the route that match request
-         * @param   Request     $request       Http Request interface
+         * @param   string          $requestMethod       Request method
+         * @param   string|Uri      $requestUri          Request URI
          * @throws  Throw a DomainException if not route has matched
          * @return  StdClass    return the matching route
         **/
-        public function match(Request $request) {
+        public function match($requestMethod, $requestUri) {
 
-            $method = $request->getMethod();
-            $uri    = $reques->getUri();
+            if(!($requestUri instanceof Uri)) {
+                $requestUri = Uri::createFromString($requestUri);
+            }
 
-            $requestMethod  = $request->getMethod();
-            $requestUri     = (string) $request->getUri();
-            $requestHost    = (string) $request->getUri()->getHost();
-            $requestPath    = (string) $request->getUri()->getPath();
+            $requestHost    = (string) $requestUri->getHost();
+            $requestPath    = (string) $requestUri->getPath();
 
             foreach($this->routes as $name => $route) {
 

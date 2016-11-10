@@ -4,6 +4,10 @@
 
     use \WOK\Uri\Uri;
 
+    /**
+     * The Route class provide an interface
+     * to manipulate a route meta informations.
+    **/
     class Route {
 
         /**
@@ -23,9 +27,9 @@
 
         /**
          * Instanciate a new route
-         * @param   array       $methods            Route accepted methods
-         * @param   string      $pattern            Route pattern
-         * @param   array       $parameters         Route patter parameters
+         * @param   string|array       $methods            Route accepted methods
+         * @param   string             $pattern            Route pattern
+         * @param   array              $parameters         Route patter parameters
          *
          * @note    The $methods parameters accept ['HTTP'] in order to stipulate any method.
          *          An empty array also specify that any method is accepted
@@ -33,14 +37,18 @@
          * @note    Parameters must be defined as [$name => $regexp] to match {$name} within
          *          the specified route pattern.
         **/
-        public function __construct(array $methods = array(), $pattern, array $parameters = array()) {
+        public function __construct($methods = array(), $pattern, array $parameters = array()) {
+
+            if(!is_array($methods)) {
+                $methods = explode('|', $methods);
+            }
 
             // Uppercase methods
             $methods = array_map(function($method) {
                 return mb_strtoupper($method);
             }, $methods);
 
-            // Replace `HTTP` by HTTP methods list
+            // Replace `HTTP` by full HTTP methods list
             if(($http = array_search('HTTP', $methods)) !== false) {
                 array_splice($methods, $http, 1, array(
                     'GET', 'HEAD', 'POST', 'PUT', 'DELETE',
