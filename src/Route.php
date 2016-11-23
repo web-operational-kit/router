@@ -62,6 +62,41 @@
 
         }
 
+
+        /**
+         * Get the route URI object
+        **/
+        public function getUri() {
+
+            return $this->uri;
+
+        }
+
+
+        /**
+         * Define the route URI
+         * @param     Uri     $uri         A Uri object
+        **/
+        public function setUri(Uri $uri) {
+
+            $this->uri = $uri;
+
+        }
+
+        /**
+         * Define the route URI within a route copy
+         * @param     Uri     $uri         A Uri object
+        **/
+        public function withUri(Uri $uri) {
+
+            $route = clone $route;
+            $route->setUri($uri);
+
+            return $route;
+
+        }
+
+
         /**
          * Check if a methods has been defined
         **/
@@ -75,11 +110,11 @@
 
 
         /**
-         * Get the route URI object
-         * @param array     $parameters         Routes parameters values
-         * @note  Define parameters as [$key=>$value]
+         * Get the route URL
+         * @param     array         $parameters         Routes parameters values as [$key=>$value]
+         * @return    string        Returns the URL where patterns parameters have been replaced
         **/
-        public function getUri(array $parameters = array()) {
+        public function getUrl(array $parameters = array()) {
 
             $host = $this->uri->getHost();
             $path = $this->uri->getPath();
@@ -93,25 +128,14 @@
                    trigger_error('Parameter "'. $name .'" doesn\'t match the REGEXP', E_USER_ERROR);
 
                $host = mb_str_replace('{'.$name.'}', $parameters[$name], $host);
-               $path    = mb_str_replace('{'.$name.'}', $parameters[$name], $path);
+               $path = mb_str_replace('{'.$name.'}', $parameters[$name], $path);
 
            }
 
            $uri = $this->uri->withHost($host);
            $uri->setPath($path);
 
-           return $uri;
-
-        }
-
-        /**
-         * Get the route URL
-         * @param array     $parameters         Routes parameters values
-         * @note  Define parameters as [$key=>$value]
-        **/
-        public function getUrl(array $parameters = array()) {
-
-            return (string) $this->getUri();
+           return (string) $uri;
 
         }
 
@@ -129,7 +153,11 @@
 
         }
 
-
+        /**
+         * Call methods that are parts of the Uri component
+         * @throws BadMethodCallException     If the method does not exist
+         * @return mixed                      Returns the method returned valud
+        **/
         public function __call($method, array $arguments = array()) {
 
             if(!method_exists($this->uri, $method)) {
