@@ -25,6 +25,17 @@
         **/
         protected $parameters   = array();
 
+
+        /**
+         * List of all HTTP accepted methods
+         * @var array    $acceptedMethods
+        **/
+        static protected $acceptedMethods = array(
+            'GET', 'HEAD', 'POST', 'PUT', 'DELETE',
+            'TRACE', 'OPTIONS', 'CONNECT', 'PATCH'
+        );
+
+
         /**
          * Instanciate a new route
          * @param   string|array       $methods            Route accepted methods
@@ -43,20 +54,8 @@
                 $methods = explode('|', $methods);
             }
 
-            // Uppercase methods
-            $methods = array_map(function($method) {
-                return mb_strtoupper($method);
-            }, $methods);
+            $this->setMethods($methods);
 
-            // Replace `HTTP` by full HTTP methods list
-            if(($http = array_search('HTTP', $methods)) !== false) {
-                array_splice($methods, $http, 1, array(
-                    'GET', 'HEAD', 'POST', 'PUT', 'DELETE',
-                    'TRACE', 'OPTIONS', 'CONNECT', 'PATCH'
-                ));
-            }
-
-            $this->methods      = $methods;
             $this->uri          = Uri::createFromString($pattern);
             $this->parameters   = $parameters;
 
@@ -98,7 +97,43 @@
 
 
         /**
+         * Retrieve the route accepted methods
+         * @return  array     Returns the accepted methods collection
+        **/
+        public function getMethods() {
+
+            return $this->methods;
+
+        }
+
+
+        /**
+         * Override methods
+        **/
+        public function setMethods(array $methods = array()) {
+
+            if(empty($methods)) {
+                $methods = array('HTTP');
+            }
+
+            // Uppercase methods
+            $methods = array_map(function($method) {
+                return mb_strtoupper($method);
+            }, $methods);
+
+            // Replace `HTTP` by full HTTP methods list
+            if(($http = array_search('HTTP', $methods)) !== false) {
+                array_splice($methods, $http, 1, self::$acceptedMethods);
+            }
+
+            return $this->methods = $methods;
+
+        }
+
+
+        /**
          * Check if a methods has been defined
+         * @return boolean     Returns whether the route accepted method or not
         **/
         public function hasMethod($method) {
 
@@ -139,6 +174,7 @@
 
         }
 
+
         /**
          * Access route properties
          * @param   string      $property       Route property's name
@@ -152,6 +188,7 @@
             return $this->$property;
 
         }
+
 
         /**
          * Call methods that are parts of the Uri component
