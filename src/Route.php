@@ -88,7 +88,7 @@
         **/
         public function withUri(Uri $uri) {
 
-            $route = clone $route;
+            $route = clone $this;
             $route->setUri($uri);
 
             return $route;
@@ -97,8 +97,8 @@
 
 
         /**
-         * Retrieve the route accepted methods
-         * @return  array     Returns the accepted methods collection
+         * Retrieve the route accepted HTTP methods
+         * @return  array     Returns the accepted HTTP methods collection
         **/
         public function getMethods() {
 
@@ -109,8 +109,9 @@
 
         /**
          * Override methods
+         * @param    array     $methods         new HTTP methods collection
         **/
-        public function setMethods(array $methods = array()) {
+        public function setMethods(array $methods) {
 
             if(empty($methods)) {
                 $methods = array('HTTP');
@@ -127,6 +128,21 @@
             }
 
             return $this->methods = $methods;
+
+        }
+
+
+        /**
+         * Override methods within a route copy
+         * @param    array     $methods         new HTTP methods collection
+         * @return   Route     Returns the route object copy
+        **/
+        public function withMethods(array $methods) {
+
+            $route = clone $this;
+            $route->setMethods($methods);
+
+            return $route;
 
         }
 
