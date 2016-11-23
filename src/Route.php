@@ -25,6 +25,17 @@
         **/
         protected $parameters   = array();
 
+
+        /**
+         * List of all HTTP accepted methods
+         * @var array    $acceptedMethods
+        **/
+        static protected $acceptedMethods = array(
+            'GET', 'HEAD', 'POST', 'PUT', 'DELETE',
+            'TRACE', 'OPTIONS', 'CONNECT', 'PATCH'
+        );
+
+
         /**
          * Instanciate a new route
          * @param   string|array       $methods            Route accepted methods
@@ -43,6 +54,69 @@
                 $methods = explode('|', $methods);
             }
 
+            $this->setMethods($methods);
+
+            $this->uri          = Uri::createFromString($pattern);
+            $this->parameters   = $parameters;
+
+        }
+
+
+        /**
+         * Get the route URI object
+        **/
+        public function getUri() {
+
+            return $this->uri;
+
+        }
+
+
+        /**
+         * Define the route URI
+         * @param     Uri     $uri         A Uri object
+        **/
+        public function setUri(Uri $uri) {
+
+            $this->uri = $uri;
+
+        }
+
+        /**
+         * Define the route URI within a route copy
+         * @param     Uri     $uri         A Uri object
+        **/
+        public function withUri(Uri $uri) {
+
+            $route = clone $this;
+            $route->setUri($uri);
+
+            return $route;
+
+        }
+
+
+        /**
+         * Retrieve the route accepted HTTP methods
+         * @return  array     Returns the accepted HTTP methods collection
+        **/
+        public function getMethods() {
+
+            return $this->methods;
+
+        }
+
+
+        /**
+         * Override methods
+         * @param    array     $methods         new HTTP methods collection
+        **/
+        public function setMethods(array $methods) {
+
+            if(empty($methods)) {
+                $methods = array('HTTP');
+            }
+
             // Uppercase methods
             $methods = array_map(function($method) {
                 return mb_strtoupper($method);
@@ -50,20 +124,32 @@
 
             // Replace `HTTP` by full HTTP methods list
             if(($http = array_search('HTTP', $methods)) !== false) {
-                array_splice($methods, $http, 1, array(
-                    'GET', 'HEAD', 'POST', 'PUT', 'DELETE',
-                    'TRACE', 'OPTIONS', 'CONNECT', 'PATCH'
-                ));
+                array_splice($methods, $http, 1, self::$acceptedMethods);
             }
 
-            $this->methods      = $methods;
-            $this->uri          = Uri::createFromString($pattern);
-            $this->parameters   = $parameters;
+            return $this->methods = $methods;
 
         }
 
+
+        /**
+         * Override methods within a route copy
+         * @param    array     $methods         new HTTP methods collection
+         * @return   Route     Returns the route object copy
+        **/
+        public function withMethods(array $methods) {
+
+            $route = clone $this;
+            $route->setMethods($methods);
+
+            return $route;
+
+        }
+
+
         /**
          * Check if a methods has been defined
+         * @return boolean     Returns whether the route accepted method or not
         **/
         public function hasMethod($method) {
 
@@ -75,11 +161,11 @@
 
 
         /**
-         * Get the route URI object
-         * @param array     $parameters         Routes parameters values
-         * @note  Define parameters as [$key=>$value]
+         * Get the route URL
+         * @param     array         $parameters         Routes parameters values as [$key=>$value]
+         * @return    string        Returns the URL where patterns parameters have been replaced
         **/
-        public function getUri(array $parameters = array()) {
+        public function getUrl(array $parameters = array()) {
 
             $host = $this->uri->getHost();
             $path = $this->uri->getPath();
@@ -93,27 +179,17 @@
                    trigger_error('Parameter "'. $name .'" doesn\'t match the REGEXP', E_USER_ERROR);
 
                $host = mb_str_replace('{'.$name.'}', $parameters[$name], $host);
-               $path    = mb_str_replace('{'.$name.'}', $parameters[$name], $path);
+               $path = mb_str_replace('{'.$name.'}', $parameters[$name], $path);
 
            }
 
            $uri = $this->uri->withHost($host);
            $uri->setPath($path);
 
-           return $uri;
+           return (string) $uri;
 
         }
 
-        /**
-         * Get the route URL
-         * @param array     $parameters         Routes parameters values
-         * @note  Define parameters as [$key=>$value]
-        **/
-        public function getUrl(array $parameters = array()) {
-
-            return (string) $this->getUri();
-
-        }
 
         /**
          * Access route properties
@@ -130,6 +206,11 @@
         }
 
 
+        /**
+         * Call methods that are parts of the Uri component
+         * @throws BadMethodCallException     If the method does not exist
+         * @return mixed                      Returns the method returned valud
+        **/
         public function __call($method, array $arguments = array()) {
 
             if(!method_exists($this->uri, $method)) {
@@ -137,6 +218,16 @@
             }
 
             return call_user_func_array([$this->uri, $method], $arguments);
+
+        }
+
+
+        /**
+         * Cloning behavior
+        **/
+        public function __clone() {
+
+            $this->uri = clone $this->uri;
 
         }
 
