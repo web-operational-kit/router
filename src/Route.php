@@ -140,4 +140,14 @@
 
         }
 
+
+        /**
+         * Cloning behavior
+        **/
+        public function __clone() {
+
+            $this->uri = clone $this->uri;
+
+        }
+
     }
