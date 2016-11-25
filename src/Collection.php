@@ -23,17 +23,17 @@
         **/
         public function addRoute(Route $route, $target, $name = null) {
 
+            if(!$name) {
+                $name = md5(serialize($target));
+            }
+
             $item = (object) array(
+                'name'      => $name,
                 'route'     => $route,
                 'target'    => $target
             );
 
-            if(!empty($name)) {
-                $this->routes[$name] = $item;
-            }
-            else {
-                $this->routes[] = $item;
-            }
+            $this->routes[$name] = $item;
 
             return $route;
 
@@ -156,7 +156,7 @@
          * @see http://php.net/manual/en/function.rewind.php
         **/
         public function rewind() {
-            rewind($this->routes);
+            reset($this->routes);
         }
 
         /**
@@ -191,7 +191,7 @@
          * @note This is an Iterator extension method
         **/
         public function valid() {
-            return false !== current($this->attributes);
+            return false !== current($this->routes);
         }
 
     }
