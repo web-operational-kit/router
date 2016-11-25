@@ -3,6 +3,7 @@
     namespace WOK\Router;
 
     use WOK\Router\Route;
+    use WOK\Uri\Uri;
 
     /**
      * Routes collection manager
