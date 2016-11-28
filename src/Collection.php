@@ -139,16 +139,6 @@
 
         }
 
-        /**
-         * Alias/Shorcut of $collection->match()
-         * @param   Request     $request       Http Request interface
-         * @throws  Throw a DomainException if not route has matched
-         * @return  StdClass    return the matching route
-        **/
-        public function __invoke(Request $request) {
-            return $this->match($request);
-        }
-
 
         /**
          * Reset routes cursor position
