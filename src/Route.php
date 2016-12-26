@@ -178,8 +178,8 @@
                if(!preg_match('#^'.$regexp.'$#isU', $parameters[$name]))
                    trigger_error('Parameter "'. $name .'" doesn\'t match the REGEXP', E_USER_ERROR);
 
-               $host = mb_str_replace('{'.$name.'}', $parameters[$name], $host);
-               $path = mb_str_replace('{'.$name.'}', $parameters[$name], $path);
+               $host = str_replace('{'.$name.'}', $parameters[$name], $host);
+               $path = str_replace('{'.$name.'}', $parameters[$name], $path);
 
            }
 
