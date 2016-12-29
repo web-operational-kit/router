@@ -172,11 +172,11 @@
 
             foreach($this->parameters as $name => $regexp) {
 
-               if(!isset($parameters[$name]))
-                   trigger_error('Missing parameter "'. $name .'"', E_USER_ERROR);
+                if(!isset($parameters[$name]))
+                    throw new \BadMethodCallException('Missing parameter "'. $name .'"', E_USER_ERROR);
 
-               if(!preg_match('#^'.$regexp.'$#isU', $parameters[$name]))
-                   trigger_error('Parameter "'. $name .'" doesn\'t match the REGEXP', E_USER_ERROR);
+                if(!preg_match('#^'.$regexp.'$#isU', $parameters[$name]))
+                    throw new \InvalidArgumentException('Parameter "'. $name .'" doesn\'t match the REGEXP ('.$parameters[$name].')', E_USER_ERROR);
 
                $host = str_replace('{'.$name.'}', $parameters[$name], $host);
                $path = str_replace('{'.$name.'}', $parameters[$name], $path);
