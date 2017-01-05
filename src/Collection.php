@@ -91,19 +91,21 @@
 
             foreach($this->routes as $name => $route) {
 
-                $target = $route->target;
-                $route  = $route->route;
-
-                // Invalid domain
-                if(!empty($host) && $host != $requestHost)
-                    continue;
+                $target     = $route->target;
+                $route      = $route->route;
+                $routeUri   = $route->uri;
+                $routeHost  = (string) $routeUri->getHost();
 
                 // Invalid method
-                if(!empty($route->methods) && (!in_array($requestHost, $route->methods)))
+                if(!empty($route->methods) && (!in_array($requestMethod, $route->methods)))
+                    continue;
+
+                // Invalid domain
+                if($routeHost && $routeHost != $requestHost)
                     continue;
 
                 // Prepare parameters
-                $pattern = (string) $route->uri;
+                $pattern = (string) $routeUri->getPath();
                 foreach($route->parameters as $name => $regexp) {
                     $pattern = str_replace('{'.$name.'}', "(?<$name>$regexp)", $pattern);
                 }
