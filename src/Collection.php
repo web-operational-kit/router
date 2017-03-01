@@ -91,19 +91,21 @@
 
             foreach($this->routes as $name => $route) {
 
-                $target = $route->target;
-                $route  = $route->route;
-
-                // Invalid domain
-                if(!empty($host) && $host != $requestHost)
-                    continue;
+                $target     = $route->target;
+                $route      = $route->route;
+                $routeUri   = $route->uri;
+                $routeHost  = (string) $routeUri->getHost();
 
                 // Invalid method
-                if(!empty($route->methods) && (!in_array($requestHost, $route->methods)))
+                if(!empty($route->methods) && (!in_array($requestMethod, $route->methods)))
+                    continue;
+
+                // Invalid domain
+                if($routeHost && $routeHost != $requestHost)
                     continue;
 
                 // Prepare parameters
-                $pattern = (string) $route->uri;
+                $pattern = (string) $routeUri->getPath();
                 foreach($route->parameters as $name => $regexp) {
                     $pattern = str_replace('{'.$name.'}', "(?<$name>$regexp)", $pattern);
                 }
@@ -111,9 +113,6 @@
                 // Invalid pattern
                 if($pattern != $requestPath && !preg_match('#^'.$pattern.'$#isU', $requestPath, $parameters))
                     continue;
-
-                // From now, this is a valid route
-                list($controller, $method) = $target;
 
                 // Reorder parameters according to definition order
                 if(!empty($parameters)) {
@@ -127,15 +126,14 @@
                 // Output route
                 return (object) array(
                     'name'          => $name,
-                    'controller'    => $controller,
-                    'action'        => $method,
+                    'action'        => $target,
                     'parameters'    => $parameters
                 );
 
             }
 
             // No route has been found
-            throw new \DomainException('Route not found for this request');
+            throw new \DomainException('Route not found for this request ('.$requestUri.')');
 
         }
 
