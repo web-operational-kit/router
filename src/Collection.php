@@ -114,9 +114,6 @@
                 if($pattern != $requestPath && !preg_match('#^'.$pattern.'$#isU', $requestPath, $parameters))
                     continue;
 
-                // From now, this is a valid route
-                list($controller, $method) = $target;
-
                 // Reorder parameters according to definition order
                 if(!empty($parameters)) {
                     $parameters = array_intersect_key($parameters, $route->parameters);
@@ -129,15 +126,14 @@
                 // Output route
                 return (object) array(
                     'name'          => $name,
-                    'controller'    => $controller,
-                    'action'        => $method,
+                    'action'        => $target,
                     'parameters'    => $parameters
                 );
 
             }
 
             // No route has been found
-            throw new \DomainException('Route not found for this request');
+            throw new \DomainException('Route not found for this request ('.$requestUri.')');
 
         }
 
