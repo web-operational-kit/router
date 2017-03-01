@@ -198,7 +198,7 @@
         public function __get($property) {
 
             if(!isset($this->$property)) {
-                throw new \DomaineException('Invalid route property '.$property);
+                throw new \DomainException('Invalid route property '.$property);
             }
 
             return $this->$property;
