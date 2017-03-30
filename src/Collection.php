@@ -93,6 +93,7 @@
 
                 $target     = $route->target;
                 $route      = $route->route;
+                $routeName  = $name;
                 $routeUri   = $route->uri;
                 $routeHost  = (string) $routeUri->getHost();
 
@@ -125,7 +126,7 @@
 
                 // Output route
                 return (object) array(
-                    'name'          => $name,
+                    'name'          => $routeName,
                     'action'        => $target,
                     'parameters'    => $parameters
                 );
